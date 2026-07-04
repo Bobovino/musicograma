@@ -338,8 +338,8 @@ export default function MusicogramaApp() {
     <div style={styles.app}>
       <style>{PRINT_STYLES}</style>
 
-      <header style={styles.header} className="no-print">
-        <div style={styles.headerLeft}>
+      <header style={styles.header} className="no-print app-header">
+        <div style={styles.headerLeft} className="app-header-left">
           <div style={styles.logoMark}>
             <Music size={20} strokeWidth={2.5} />
           </div>
@@ -349,14 +349,14 @@ export default function MusicogramaApp() {
             style={styles.projectNameInput}
           />
         </div>
-        <div style={styles.headerRight}>
+        <div style={styles.headerRight} className="app-header-right">
           <button style={styles.iconBtn} onClick={newProject} title="Empezar un musicograma nuevo">
             <FilePlus2 size={16} /> Nuevo
           </button>
-          <button style={styles.iconBtn} onClick={saveProject} title="Guardar proyecto (incluye el audio)" disabled={isSaving}>
+          <button style={styles.iconBtn} className="desktop-only" onClick={saveProject} title="Guardar proyecto (incluye el audio)" disabled={isSaving}>
             <Save size={16} /> {isSaving ? 'Guardando...' : 'Guardar'}
           </button>
-          <button style={styles.iconBtn} onClick={openLoadDialog} title="Abrir proyecto guardado">
+          <button style={styles.iconBtn} className="desktop-only" onClick={openLoadDialog} title="Abrir proyecto guardado">
             <FolderOpen size={16} /> Abrir
           </button>
           <button
@@ -416,7 +416,7 @@ export default function MusicogramaApp() {
                 onTimeUpdate={onTimeUpdate}
               />
 
-              <div style={styles.transport}>
+              <div style={styles.transport} className="app-transport">
                 <button style={styles.playBtn} onClick={togglePlay}>
                   {isPlaying ? <Pause size={22} /> : <Play size={22} style={{ marginLeft: 2 }} />}
                 </button>
@@ -424,23 +424,25 @@ export default function MusicogramaApp() {
                 <span style={styles.timeSep}>/</span>
                 <span style={styles.timeLabel}>{formatTime(duration)}</span>
 
-                <div style={{ flex: 1 }} />
+                <div style={{ flex: 1 }} className="desktop-only" />
 
-                <button style={styles.secondaryBtn} onClick={addManualMarker}>
-                  <Plus size={15} /> Marcar aquí
-                </button>
-                <button style={styles.secondaryBtn} onClick={() => setShowSplitDialog(true)}>
-                  <Grid3x3 size={15} /> Dividir en partes
-                </button>
-                <button style={styles.secondaryBtn} onClick={() => setShowTemplates(true)}>
-                  Plantillas
-                </button>
-                <button
-                  style={{ ...styles.secondaryBtn, color: '#B5482A' }}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  Cambiar audio
-                </button>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }} className="app-transport-actions">
+                  <button style={styles.secondaryBtn} onClick={addManualMarker}>
+                    <Plus size={15} /> Marcar aquí
+                  </button>
+                  <button style={styles.secondaryBtn} onClick={() => setShowSplitDialog(true)}>
+                    <Grid3x3 size={15} /> Dividir en partes
+                  </button>
+                  <button style={styles.secondaryBtn} onClick={() => setShowTemplates(true)}>
+                    Plantillas
+                  </button>
+                  <button
+                    style={{ ...styles.secondaryBtn, color: '#B5482A' }}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    Cambiar audio
+                  </button>
+                </div>
               </div>
 
               <Timeline
@@ -456,7 +458,7 @@ export default function MusicogramaApp() {
                 onBoundaryChange={updateBoundary}
               />
 
-              <div style={styles.editorGrid}>
+              <div style={styles.editorGrid} className="app-editor-grid">
                 <SegmentList
                   segments={sortedSegments}
                   selectedSegmentId={selectedSegmentId}

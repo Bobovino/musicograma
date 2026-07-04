@@ -46,3 +46,58 @@ a {
     transform: rotate(360deg);
   }
 }
+
+/* Guardar/Abrir rely on browser-local IndexedDB, which isn't reliably
+   persistent on mobile browsers — hide that whole feature there rather than
+   let people trust a save that might not survive. Desktop keeps it. */
+@media (max-width: 640px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .app-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .app-header-left {
+    width: 100%;
+  }
+
+  .app-header-left input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Buttons default to white-space: nowrap, so flex:1 alone can't shrink
+     them below their text's content width — they'd just overflow the row
+     instead of wrapping. Stack full-width instead of fighting that. */
+  .app-header-right {
+    flex-direction: column !important;
+    width: 100%;
+  }
+
+  .app-header-right button {
+    width: 100%;
+    justify-content: center !important;
+  }
+
+  .app-transport {
+    justify-content: flex-start !important;
+  }
+
+  .app-transport-actions {
+    flex-direction: column !important;
+    width: 100%;
+  }
+
+  .app-transport-actions button {
+    width: 100%;
+    justify-content: center !important;
+  }
+
+  .app-editor-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
