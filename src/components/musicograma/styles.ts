@@ -187,6 +187,8 @@ export const styles: Record<string, CSSProperties> = {
     padding: '9px 12px',
     borderRadius: 8,
     border: '1px solid #E5D9C3',
+    background: '#fff',
+    color: '#2D2620',
     fontSize: 13,
     fontFamily: 'inherit',
     boxSizing: 'border-box',

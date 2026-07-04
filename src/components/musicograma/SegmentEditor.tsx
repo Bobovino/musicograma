@@ -39,7 +39,7 @@ export function SegmentEditor({ segment, onUpdate }: SegmentEditorProps) {
                   background: segment.shape === key ? '#F0E8D8' : '#fff',
                 }}
               >
-                <Icon size={18} />
+                <Icon size={18} color="#2D2620" />
               </button>
             ))}
           </div>
