@@ -3,7 +3,7 @@
 import { Circle, Download, FolderOpen, Grid3x3, Music, Pause, Play, Plus, Save, Upload } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { COLORS, INSTRUMENT_ICONS, SHAPES, SHAPE_KEYS, TEMPLATES } from './constants';
-import { dbDeleteProject, dbListProjects, dbLoadProject, dbSaveProject } from './db';
+import { dbDeleteProject, dbListProjects, dbLoadProject, dbSaveProject, requestPersistentStorage } from './db';
 import { ProjectsModal } from './ProjectsModal';
 import { PresentationView } from './PresentationView';
 import { SegmentEditor } from './SegmentEditor';
@@ -45,6 +45,10 @@ export default function MusicogramaApp() {
     setToast(msg);
     setTimeout(() => setToast(null), 2500);
   };
+
+  useEffect(() => {
+    requestPersistentStorage();
+  }, []);
 
   const handleFileUpload = async (file: File | undefined) => {
     if (!file) return;

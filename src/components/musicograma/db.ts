@@ -13,6 +13,21 @@ function isIndexedDBAvailable(): boolean {
   return typeof window !== 'undefined' && 'indexedDB' in window;
 }
 
+// Asks the browser not to evict this site's storage under pressure (or, on
+// iOS Safari, after ~7 days without interaction in a regular tab). Not a
+// guarantee — the browser/OS can still refuse or evict regardless — but it
+// meaningfully lowers the odds of losing saved projects, especially on mobile.
+export async function requestPersistentStorage(): Promise<boolean> {
+  if (typeof navigator === 'undefined' || !navigator.storage?.persist) return false;
+  try {
+    const alreadyPersisted = await navigator.storage.persisted?.();
+    if (alreadyPersisted) return true;
+    return await navigator.storage.persist();
+  } catch {
+    return false;
+  }
+}
+
 function openDB(): Promise<IDBDatabase> {
   if (!isIndexedDBAvailable()) {
     return Promise.reject(new Error('IndexedDB no está disponible en este navegador'));
