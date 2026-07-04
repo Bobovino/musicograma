@@ -1,7 +1,8 @@
 'use client';
 
-import { Circle, Download, FolderOpen, Grid3x3, Music, Pause, Play, Plus, Save, Upload } from 'lucide-react';
+import { Circle, Download, FilePlus2, FolderOpen, Grid3x3, Music, Pause, Play, Plus, Save, Upload } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { COLORS, INSTRUMENT_ICONS, SHAPES, SHAPE_KEYS, TEMPLATES } from './constants';
 import { dbDeleteProject, dbListProjects, dbLoadProject, dbSaveProject, requestPersistentStorage } from './db';
 import { ProjectsModal } from './ProjectsModal';
@@ -36,6 +37,7 @@ export default function MusicogramaApp() {
   const [savedProjects, setSavedProjects] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [loadingProjectName, setLoadingProjectName] = useState<string | null>(null);
+  const [isAnalyzingAudio, setIsAnalyzingAudio] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -54,11 +56,19 @@ export default function MusicogramaApp() {
   const handleFileUpload = async (file: File | undefined) => {
     if (!file) return;
     const url = URL.createObjectURL(file);
-    setAudioFile(file);
-    setAudioUrl(url);
-    setSegments([]);
-    setSelectedSegmentId(null);
-    setWaveform(await analyzeWaveform(file));
+    flushSync(() => {
+      setAudioFile(file);
+      setAudioUrl(url);
+      setSegments([]);
+      setSelectedSegmentId(null);
+      setWaveform([]);
+      setIsAnalyzingAudio(true);
+    });
+    try {
+      setWaveform(await analyzeWaveform(file));
+    } finally {
+      setIsAnalyzingAudio(false);
+    }
   };
 
   const onAudioLoadedMetadata = () => {
@@ -255,7 +265,10 @@ export default function MusicogramaApp() {
   };
 
   const loadProject = async (name: string) => {
-    setLoadingProjectName(name);
+    // flushSync forces React to commit + paint the spinner before the
+    // (potentially multi-second) DB read + audio decode below run, instead
+    // of leaving it to automatic batching, which offers no timing guarantee.
+    flushSync(() => setLoadingProjectName(name));
     try {
       const data = await dbLoadProject(name);
       if (!data) {
@@ -301,6 +314,24 @@ export default function MusicogramaApp() {
     window.print();
   };
 
+  const newProject = () => {
+    if (audioUrl || segments.length > 0) {
+      const ok = confirm('¿Empezar un musicograma nuevo? Se perderá lo que no hayas guardado.');
+      if (!ok) return;
+    }
+    setAudioFile(null);
+    setAudioUrl(null);
+    setDuration(0);
+    setCurrentTime(0);
+    setIsPlaying(false);
+    setWaveform([]);
+    setSegments([]);
+    setSelectedSegmentId(null);
+    setProjectName('Mi musicograma');
+    setMode('edit');
+    showToast('Musicograma nuevo');
+  };
+
   const selectedSegment = sortedSegments.find((s) => s.id === selectedSegmentId);
 
   return (
@@ -319,6 +350,9 @@ export default function MusicogramaApp() {
           />
         </div>
         <div style={styles.headerRight}>
+          <button style={styles.iconBtn} onClick={newProject} title="Empezar un musicograma nuevo">
+            <FilePlus2 size={16} /> Nuevo
+          </button>
           <button style={styles.iconBtn} onClick={saveProject} title="Guardar proyecto (incluye el audio)" disabled={isSaving}>
             <Save size={16} /> {isSaving ? 'Guardando...' : 'Guardar'}
           </button>
@@ -416,6 +450,7 @@ export default function MusicogramaApp() {
                 duration={duration}
                 currentTime={currentTime}
                 selectedSegmentId={selectedSegmentId}
+                isAnalyzingAudio={isAnalyzingAudio}
                 onSelectSegment={setSelectedSegmentId}
                 onTimelineClick={handleTimelineClick}
                 onBoundaryChange={updateBoundary}

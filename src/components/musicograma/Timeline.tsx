@@ -1,6 +1,6 @@
 'use client';
 
-import { Circle } from 'lucide-react';
+import { Circle, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { SHAPES } from './constants';
 import { styles } from './styles';
@@ -13,6 +13,7 @@ interface TimelineProps {
   duration: number;
   currentTime: number;
   selectedSegmentId: string | null;
+  isAnalyzingAudio: boolean;
   onSelectSegment: (id: string) => void;
   onTimelineClick: (time: number) => void;
   onBoundaryChange: (segmentId: string, newStart: number) => void;
@@ -25,6 +26,7 @@ export function Timeline({
   duration,
   currentTime,
   selectedSegmentId,
+  isAnalyzingAudio,
   onSelectSegment,
   onTimelineClick,
   onBoundaryChange,
@@ -143,6 +145,24 @@ export function Timeline({
               pointerEvents: 'none',
             }}
           />
+        )}
+
+        {isAnalyzingAudio && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              background: 'rgba(251,247,238,0.85)',
+              pointerEvents: 'none',
+            }}
+          >
+            <Loader2 size={18} color="#8B7355" style={{ animation: 'spin 1s linear infinite' }} />
+            <span style={{ fontSize: 12.5, color: '#8B7355', fontWeight: 600 }}>Analizando audio...</span>
+          </div>
         )}
       </div>
       <p style={styles.timelineHint}>
