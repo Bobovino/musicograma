@@ -35,6 +35,7 @@ export default function MusicogramaApp() {
   const [showOpenDialog, setShowOpenDialog] = useState(false);
   const [savedProjects, setSavedProjects] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [loadingProjectName, setLoadingProjectName] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -254,6 +255,7 @@ export default function MusicogramaApp() {
   };
 
   const loadProject = async (name: string) => {
+    setLoadingProjectName(name);
     try {
       const data = await dbLoadProject(name);
       if (!data) {
@@ -279,6 +281,8 @@ export default function MusicogramaApp() {
     } catch (e) {
       console.error(e);
       showToast('Error al cargar el proyecto');
+    } finally {
+      setLoadingProjectName(null);
     }
   };
 
@@ -466,6 +470,7 @@ export default function MusicogramaApp() {
       {showOpenDialog && (
         <ProjectsModal
           projects={savedProjects}
+          loadingProjectName={loadingProjectName}
           onClose={() => setShowOpenDialog(false)}
           onOpen={loadProject}
           onDelete={deleteProject}
